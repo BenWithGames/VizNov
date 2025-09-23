@@ -1,0 +1,67 @@
+- id: intro_01
+  lines:
+  - speaker: Anime Chick
+    text: "Hello there."
+  - speaker: Anime Chick
+    text: "Do you want to go on an adventure?"
+    choices:
+    - text: "Yes"
+      next: intro_01_yes
+    - text: "No"
+      next: intro_01_no
+
+- id: intro_01_yes
+  nextScene: SecondScene
+  lines:
+  - speaker: Anime Chick
+    text: "Then let's go to the next scene."
+
+- id: intro_01_no
+  lines:
+  - speaker: Anime Chick
+    text: "Then don't come back."
+    speed: 0.3
+
+- id: intro_02
+  lines:
+  - speaker: Anime Chick
+    text: "Here is the next scene."
+
+### First scene of the game ###
+- id: intro_first_scene
+  lines:
+  - speaker: Diety
+    text: "Hello. I am Diety."
+  - speaker: Diety
+    text: "You are in the Edge of Souls. A realm not made for man. Here, I reside looking over the world."
+  - speaker: Diety
+    text: "Do not fear. I am not your enemy. I have listened to the peoples prayers."
+  - speaker: Diety
+    text: "You are the answers to their prayers."
+  - speaker: Diety
+    text: "From my benevolance, I have heard the cries from my people and grated them the hero they so desperately need."
+  - speaker: Diety
+    text: "You will not understand now, but you will become a hero. People will come to your for aid."
+  - speaker: Diety
+    text: "Evil lurks in these lands that you are about to embark on. It is your duty decreed by me to rid these lands of said evil."
+  - speaker: Diety
+    text: "Do you understand everything I have said to you?"
+    choices:
+    - text: "Yes"
+      next: intro_first_scene_yes
+    - text: "No"
+      next: intro_first_scene_no
+
+- id: intro_first_scene_yes
+  nextScene: SceneForest
+  lines:
+  - speaker: Diety
+    text: "Then go. Your people are needed."
+
+- id: intro_first_scene_no
+  nextScene: SceneForest
+  lines:
+  - speaker: Diety
+    text: "That is understandable. It is best you see for yourself firsthand what your purpose is."
+
+### 

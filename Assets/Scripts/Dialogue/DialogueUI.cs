@@ -16,6 +16,7 @@ public class DialogueUI : MonoBehaviour
     [SerializeField] private GameObject choiceButtonPrefab;
 
 
+
     private DialogueData currentDialogue;
     private int currentLineIndex;
     private Coroutine typingCoroutine;
@@ -24,8 +25,13 @@ public class DialogueUI : MonoBehaviour
     [SerializeField] private AudioSource typeSoundSource; // shared AudioSource
     [SerializeField] private int charsPerSound = 2;
     [SerializeField] private List<SpeakerSound> speakerSounds = new List<SpeakerSound>();
+    [SerializeField] private GameObject inputPanel;        // container with input UI
+    [SerializeField] private TMP_InputField inputField;    // actual input box
+    [SerializeField] private Button confirmButton;
 
     private AudioClip currentSpeakerClip;
+
+    private string pendingInputKey;
 
     [System.Serializable]
     public class SpeakerSound
@@ -37,7 +43,18 @@ public class DialogueUI : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        if (panel != null) panel.SetActive(false);
+
+        if (panel != null)
+        {
+            panel.SetActive(false);
+            Debug.Log($"[DialogueUI] Hiding panel {panel.name} on Awake");
+        }
+
+        if (inputPanel != null)
+        {
+            inputPanel.SetActive(false);
+            Debug.Log($"[DialogueUI] Hiding inputPanel {inputPanel.name} on Awake");
+        }
     }
 
     public void StartDialogue(DialogueData dialogue)
@@ -64,6 +81,7 @@ public class DialogueUI : MonoBehaviour
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);
 
+        // pick speaker sound
         currentSpeakerClip = null;
         foreach (var mapping in speakerSounds)
         {
@@ -86,9 +104,10 @@ public class DialogueUI : MonoBehaviour
         isTyping = true;
         dialogueText.text = "";
 
+        string processedText = ReplacePlaceholders(line.Text);
         int charCount = 0;
 
-        foreach (char c in line.Text)
+        foreach (char c in processedText)
         {
             dialogueText.text += c;
             charCount++;
@@ -103,7 +122,13 @@ public class DialogueUI : MonoBehaviour
 
         isTyping = false;
         SpawnChoices(line);
+
+        if (!string.IsNullOrEmpty(line.InputKey))
+        {
+            ShowInputPrompt(line.InputKey);
+        }
     }
+
 
     private void SpawnChoices(DialogueLine line)
     {
@@ -147,6 +172,8 @@ public class DialogueUI : MonoBehaviour
     {
         if (!panel || !panel.activeInHierarchy) return;
 
+        if (inputPanel != null && inputPanel.activeSelf) return;
+
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (isTyping)
@@ -162,6 +189,47 @@ public class DialogueUI : MonoBehaviour
             }
         }
     }
+    private void ShowInputPrompt(string key)
+    {
+        pendingInputKey = key;
+        inputPanel.SetActive(true);
+        inputField.text = "";
 
+        // disable confirm until text entered
+        if (confirmButton != null) confirmButton.interactable = false;
+
+        inputField.onValueChanged.RemoveAllListeners();
+        inputField.onValueChanged.AddListener((text) =>
+        {
+            if (confirmButton != null)
+                confirmButton.interactable = !string.IsNullOrEmpty(text.Trim());
+        });
+    }
+
+    public void ConfirmInput()
+    {
+        string value = inputField.text.Trim();
+        if (string.IsNullOrEmpty(value))
+        {
+            Debug.Log("Name cannot be empty!");
+            return;
+        }
+
+        PlayerPrefs.SetString(pendingInputKey, value);
+        PlayerPrefs.Save();
+
+        inputPanel.SetActive(false);
+        NextLine();
+    }
+
+    private string ReplacePlaceholders(string text)
+    {
+        if (text.Contains("{PlayerName}"))
+        {
+            string name = PlayerPrefs.GetString("PlayerName", "Player");
+            text = text.Replace("{PlayerName}", name);
+        }
+        return text;
+    }
 
 }

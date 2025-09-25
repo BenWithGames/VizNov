@@ -31,6 +31,9 @@ public class DialogueLine
 
     [YamlMember(Alias = "speed")]
     public float TypingSpeed { get; set; } = -1f;
+
+    [YamlMember(Alias = "input")]
+    public string InputKey;
 }
 
 [System.Serializable]

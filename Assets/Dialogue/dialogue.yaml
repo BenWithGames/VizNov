@@ -35,7 +35,12 @@
   - speaker: Diety
     text: "You are in the Edge of Souls. A realm not made for man. Here, I reside looking over the world."
   - speaker: Diety
-    text: "Do not fear. I am not your enemy. I have listened to the peoples prayers."
+    text: "Please, tell me your name."
+    input: PlayerName
+  - speaker: Diety
+    text: "{PlayerName}..."
+  - speaker: Diety
+    text: "Do not fear {PlayerName}. I am not your enemy. I have listened to the peoples prayers."
   - speaker: Diety
     text: "You are the answers to their prayers."
   - speaker: Diety

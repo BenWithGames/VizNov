@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 810009361185458209}
   - component: {fileID: 3573576323880052692}
+  - component: {fileID: 763431560797054877}
   m_Layer: 0
   m_Name: DialogueSystem
   m_TagString: Untagged
@@ -45,3 +46,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueLoader
   yamlFile: {fileID: 4900000, guid: 78ccc5a243303784496a8eef3b956f90, type: 3}
+--- !u!114 &763431560797054877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2643466292819891393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f494f3c6011b33949aae4e9944f92f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueUI
+  panel: {fileID: 0}
+  speakerText: {fileID: 0}
+  dialogueText: {fileID: 0}
+  choicesContainer: {fileID: 0}
+  choiceButtonPrefab: {fileID: 7692511288106223154, guid: 10464abff226c244e9c6d44e27708736, type: 3}
+  narrationPanel: {fileID: 0}
+  narrationText: {fileID: 0}
+  typeSoundSource: {fileID: 0}
+  charsPerSound: 2
+  speakerSounds:
+  - speakerName: Diety
+    soundClip: {fileID: 8300000, guid: 0eb209fe0ab05114b999fe3155a9fe45, type: 3}
+  narrationClip: {fileID: 0}
+  inputPanel: {fileID: 0}
+  inputField: {fileID: 0}
+  confirmButton: {fileID: 0}

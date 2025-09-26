@@ -5,18 +5,21 @@ public class SceneForest : MonoBehaviour
 {
     [Header("Cutscene Objects")]
     public GameObject fadeScreen;
+    public GameObject patrolGuard;
+
+    [Header("Audio Clips")]
+    public AudioSource swordFight;
 
     [Header("Dialogue")]
     public DialogueUI dialogueUI;   // assign the DialogueUI instance in the Inspector
     public string startingDialogueId1 = "scene_forest_1";
     public string startingDialogueId2 = "scene_forest_2";
-    public string startingDialogueId3 = "scene_forest_3";
-    public string startingDialogueId4 = "scene_forest_4";
 
     private DialogueLoader loader;
 
     private void Start()
     {
+        patrolGuard.SetActive(false);
         loader = Object.FindFirstObjectByType<DialogueLoader>();
         if (loader == null)
         {
@@ -40,11 +43,12 @@ public class SceneForest : MonoBehaviour
         yield return StartCoroutine(PlayDialogue(startingDialogueId1));
 
         // do something else here (animations, fades, etc.)
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.5f);
+        patrolGuard.SetActive(true);
+        yield return new WaitForSeconds(1.3f);
 
         yield return StartCoroutine(PlayDialogue(startingDialogueId2));
-        yield return StartCoroutine(PlayDialogue(startingDialogueId3));
-        yield return StartCoroutine(PlayDialogue(startingDialogueId4));
+        swordFight.Play();
 
         Debug.Log("All dialogues finished!");
     }

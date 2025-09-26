@@ -7,14 +7,23 @@ public class SceneForest : MonoBehaviour
     public GameObject fadeScreen;
 
     [Header("Dialogue")]
-    public DialogueUI dialogueUI;
+    public DialogueUI dialogueUI;   // assign the DialogueUI instance in the Inspector
     public string startingDialogueId1 = "scene_forest_1";
     public string startingDialogueId2 = "scene_forest_2";
     public string startingDialogueId3 = "scene_forest_3";
     public string startingDialogueId4 = "scene_forest_4";
 
-    void Start()
+    private DialogueLoader loader;
+
+    private void Start()
     {
+        loader = Object.FindFirstObjectByType<DialogueLoader>();
+        if (loader == null)
+        {
+            Debug.LogError("SceneForest: No DialogueLoader found in this scene!");
+            return;
+        }
+
         StartCoroutine(EventStarter());
     }
 
@@ -42,28 +51,27 @@ public class SceneForest : MonoBehaviour
 
     private IEnumerator PlayDialogue(string dialogueId)
     {
-        var dialogue = DialogueLoader.Instance?.GetDialogue(dialogueId);
+        var dialogue = loader.GetDialogue(dialogueId);
         if (dialogue == null)
         {
-            Debug.LogError($"Dialogue with id '{dialogueId}' not found!");
+            Debug.LogError($"SceneForest: Dialogue with id '{dialogueId}' not found!");
             yield break;
         }
 
-        DialogueUI ui = DialogueUI.Instance;
-        if (ui == null)
+        if (dialogueUI == null)
         {
-            Debug.LogError("DialogueUI.Instance is missing!");
+            Debug.LogError("SceneForest: DialogueUI is not assigned in the Inspector!");
             yield break;
         }
 
         bool finished = false;
         System.Action endHandler = () => finished = true;
 
-        ui.OnDialogueEnd += endHandler;
-        ui.StartDialogue(dialogue);
+        dialogueUI.OnDialogueEnd += endHandler;
+        dialogueUI.StartDialogue(dialogue);
 
         yield return new WaitUntil(() => finished);
 
-        ui.OnDialogueEnd -= endHandler;
+        dialogueUI.OnDialogueEnd -= endHandler;
     }
 }

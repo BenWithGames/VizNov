@@ -1,15 +1,14 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class DialogueUI : MonoBehaviour
 {
-    public static DialogueUI Instance { get; private set; }
     [Header("UI References (assign in prefab)")]
     [SerializeField] private GameObject panel;               // Dialogue panel
     [SerializeField] private TextMeshProUGUI speakerText;
@@ -31,12 +30,16 @@ public class DialogueUI : MonoBehaviour
     [SerializeField] private AudioClip narrationClip;
 
     [Header("Input Prompt")]
-    [SerializeField] private GameObject inputPanel;        // container with input UI
-    [SerializeField] private TMP_InputField inputField;    // actual input box
+    [SerializeField] private GameObject inputPanel;
+    [SerializeField] private TMP_InputField inputField;
     [SerializeField] private Button confirmButton;
+
+    [Header("Dialogue Loader (scene-local)")]
+    [SerializeField] private DialogueLoader loader; // assign in Inspector or auto-find
 
     private AudioClip currentSpeakerClip;
     private string pendingInputKey;
+
     public event System.Action OnDialogueEnd;
 
     [System.Serializable]
@@ -48,21 +51,14 @@ public class DialogueUI : MonoBehaviour
 
     private void Awake()
     {
-      
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         if (panel != null) panel.SetActive(false);
         if (narrationPanel != null) narrationPanel.SetActive(false);
         if (inputPanel != null) inputPanel.SetActive(false);
-    }
 
+        // Auto-find DialogueLoader if not assigned
+        if (loader == null)
+            loader = Object.FindFirstObjectByType<DialogueLoader>();
+    }
 
     public void StartDialogue(DialogueData dialogue)
     {
@@ -85,15 +81,14 @@ public class DialogueUI : MonoBehaviour
         if (panel != null) panel.SetActive(false);
         if (narrationPanel != null) narrationPanel.SetActive(false);
 
-        // Dialogue line (speaker exists)
         if (!string.IsNullOrEmpty(line.Speaker))
         {
+            // Character dialogue
             if (panel != null) panel.SetActive(true);
             if (speakerText != null) speakerText.text = line.Speaker;
 
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
-            // Match sound clip for this speaker
             currentSpeakerClip = null;
             foreach (var mapping in speakerSounds)
             {
@@ -112,7 +107,7 @@ public class DialogueUI : MonoBehaviour
         }
         else
         {
-            // Narration mode (speaker null/empty)
+            // Narration
             if (narrationPanel != null) narrationPanel.SetActive(true);
 
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
@@ -168,7 +163,6 @@ public class DialogueUI : MonoBehaviour
             narrationText.text += c;
             charCount++;
 
-            // play narration typing sound every few chars
             if (narrationClip != null && charsPerSound > 0 && charCount % charsPerSound == 0)
             {
                 typeSoundSource.PlayOneShot(narrationClip);
@@ -180,8 +174,6 @@ public class DialogueUI : MonoBehaviour
         isTyping = false;
     }
 
-
-
     private void SpawnChoices(DialogueLine line)
     {
         foreach (Transform child in choicesContainer)
@@ -192,16 +184,27 @@ public class DialogueUI : MonoBehaviour
             foreach (var choice in line.Choices)
             {
                 var choiceGO = Instantiate(choiceButtonPrefab, choicesContainer);
-                choiceGO.GetComponentInChildren<TextMeshProUGUI>().text = choice.Text;
 
-                choiceGO.GetComponent<Button>().onClick.AddListener(() =>
+                // Replace placeholders here 👇
+                var label = choiceGO.GetComponentInChildren<TextMeshProUGUI>();
+                if (label != null)
+                    label.text = ReplacePlaceholders(choice.Text);
+
+                var btn = choiceGO.GetComponent<Button>();
+                if (btn != null)
                 {
-                    var nextDialogue = DialogueLoader.Instance.GetDialogue(choice.Next);
-                    StartDialogue(nextDialogue);
-                });
+                    string nextId = choice.Next; // capture
+                    btn.onClick.AddListener(() =>
+                    {
+                        var nextDialogue = FindFirstObjectByType<DialogueLoader>()?.GetDialogue(nextId);
+                        if (nextDialogue != null)
+                            StartDialogue(nextDialogue);
+                    });
+                }
             }
         }
     }
+
 
     public void NextLine()
     {
@@ -219,11 +222,11 @@ public class DialogueUI : MonoBehaviour
             SceneManager.LoadScene(currentDialogue.NextScene);
         }
 
-        OnDialogueEnd?.Invoke(); // notify cutscene controller
+        OnDialogueEnd?.Invoke();
     }
+
     private void Update()
     {
-        // Skip update if no dialogue or narration is visible
         if ((panel == null || !panel.activeInHierarchy) &&
             (narrationPanel == null || !narrationPanel.activeInHierarchy))
             return;
@@ -272,7 +275,6 @@ public class DialogueUI : MonoBehaviour
             if (confirmButton != null)
                 confirmButton.interactable = !string.IsNullOrEmpty(text.Trim());
         });
-
     }
 
     public void ConfirmInput()
@@ -300,6 +302,4 @@ public class DialogueUI : MonoBehaviour
         }
         return text;
     }
-
-
 }

@@ -98,8 +98,6 @@
     - text: "I'm... the chosen one?"
       next: scene_forest_2_chosenone
 
-### Sheath sound
-
 - id: scene_forest_2_playername
   lines:
   - speaker: Patrol Guard

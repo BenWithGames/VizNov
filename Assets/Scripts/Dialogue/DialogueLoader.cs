@@ -5,25 +5,21 @@ using YamlDotNet.Serialization;
 
 public class DialogueLoader : MonoBehaviour
 {
-    public static DialogueLoader Instance { get; private set; }
-
-    public TextAsset yamlFile;   // drag your YAML file here
+    [Header("YAML File")]
+    [Tooltip("Assign a YAML file for this scene's cutscene/dialogue")]
+    public TextAsset yamlFile;
 
     private Dictionary<string, DialogueData> dialogueDatabase;
 
     private void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
+        if (yamlFile == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // keep between scenes
-            LoadDialogue();
+            Debug.LogError("DialogueLoader: No YAML file assigned!");
+            return;
         }
-        else
-        {
-            Destroy(gameObject); // only one loader allowed
-        }
+
+        LoadDialogue();
     }
 
     private void LoadDialogue()
@@ -40,14 +36,22 @@ public class DialogueLoader : MonoBehaviour
                 dialogueDatabase[dialogue.Id] = dialogue;
             }
         }
+
+        Debug.Log($"DialogueLoader: Loaded {dialogueDatabase.Count} dialogues from {yamlFile.name}");
     }
 
     public DialogueData GetDialogue(string id)
     {
+        if (dialogueDatabase == null)
+        {
+            Debug.LogError("DialogueLoader: Database not loaded.");
+            return null;
+        }
+
         if (dialogueDatabase.TryGetValue(id, out var data))
             return data;
 
-        Debug.LogError($"Dialogue with id {id} not found!");
+        Debug.LogError($"DialogueLoader: Dialogue with id '{id}' not found!");
         return null;
     }
 }

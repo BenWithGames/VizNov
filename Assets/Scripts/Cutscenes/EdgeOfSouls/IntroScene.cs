@@ -5,16 +5,26 @@ public class IntroScene : MonoBehaviour
 {
     [Header("Cutscene Objects")]
     public GameObject fadeScreenIn;
-    public GameObject charAnimeChick;
+    public GameObject deitySprite;
 
     [Header("Dialogue")]
-    public DialogueUI dialogueUI;          // assign in Inspector
-    public string startingDialogueId = "intro_01";
+    public DialogueUI dialogueUI;          // assign the DialogueUI instance in Inspector
+    public string startingDialogueId = "intro_first_scene";
 
-    void Start()
+    private DialogueLoader loader;
+
+    private void Start()
     {
-        if (charAnimeChick != null)
-            charAnimeChick.SetActive(false);
+        if (deitySprite != null)
+            deitySprite.SetActive(false);
+
+        // grab the DialogueLoader from the scene
+        loader = Object.FindFirstObjectByType<DialogueLoader>();
+        if (loader == null)
+        {
+            Debug.LogError("IntroScene: No DialogueLoader found in this scene!");
+            return;
+        }
 
         StartCoroutine(EventStarter());
     }
@@ -23,25 +33,26 @@ public class IntroScene : MonoBehaviour
     {
         Debug.Log("Starting cutscene...");
 
-        // Get dialogue from loader
-        var dialogue = DialogueLoader.Instance?.GetDialogue(startingDialogueId);
+        // Load dialogue from YAML
+        var dialogue = loader.GetDialogue(startingDialogueId);
         if (dialogue == null)
         {
             Debug.LogError($"IntroScene: Dialogue with id '{startingDialogueId}' not found!");
             yield break;
         }
 
-        // Run sequence
-        yield return new WaitForSeconds(1f);
+        // Small delay before fade
+        yield return new WaitForSeconds(1f / 0.06f);
 
         if (fadeScreenIn != null)
             fadeScreenIn.SetActive(false);
 
-        if (charAnimeChick != null)
-            charAnimeChick.SetActive(true);
+        if (deitySprite != null)
+            deitySprite.SetActive(true);
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1f);
 
+        // Start dialogue
         if (dialogueUI != null)
         {
             dialogueUI.StartDialogue(dialogue);

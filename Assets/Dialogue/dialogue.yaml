@@ -70,3 +70,45 @@
     text: "That is understandable. It is best you see for yourself firsthand what your purpose is."
 
 ### 
+
+### Scene Forest 1 ###
+- id: scene_forest_1
+  lines:
+  - speaker:
+    text: "It's dark. The leaves are blowing in the wind. The moonlight sky barely pierces through the crowded trees for you to see your surronding."
+  - speaker:
+    text: "As you finally decide to start taking your first step, you hear the clattering of armor behind you from a distance."
+  - speaker: Patrol Guard
+    text: "HALT!"
+
+### Guard appears
+- id: scene_forest_2
+  lines:
+  - speaker: Patrol Guard
+    text: "And where do you think you're going? Do you realize what time it is?"
+  - speaker: Patrol Guard
+    text: "Let me see some identification."
+  - speaker:
+    text: "You look down as you reach into your pockets and turn them inside. A silent pause causes you to look up back to the guard."
+  - speaker: Patrol Guard
+    text: "How stupid of you to wander out past curfew without identification. Tell me your name now. You do not look familiar."
+    choices:
+    - text: "{PlayerName}"
+      next: scene_forest_2_playername
+    - text: "I'm... the chosen one?"
+      next: scene_forest_2_chosenone
+
+- id: scene_forest_2_playername
+  lines:
+  - speaker: Patrol Guard
+    text: "{PlayerName}? I've never heard of you before. Arrest him and bring him in for questioning."
+  - speaker:
+    text: "The other two guards surround you to put handcuffs behind your back."
+
+### Guard dies - Girl Enters
+- id: scene_forest_2_chosenone
+  lines:
+  - speaker: Patrol Guard
+    text: "You think this is some sort of game?"
+  - speaker:
+    text: "The guard unsheaths his sword."
